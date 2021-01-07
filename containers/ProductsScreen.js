@@ -1,174 +1,222 @@
-import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  ProgressBarAndroidBase,
-  Dimensions,
-  ScrollView,
-  SafeAreaView,
-  Button,
-  Alert,
-  Modal,
-  TouchableHighlight,
-} from "react-native";
-import { StatusBar } from "expo-status-bar";
-import { color, set } from "react-native-reanimated";
-import axios from "axios";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import { Colors } from "react-native/Libraries/NewAppScreen";
-import colors from "../assets/colors";
-import { Entypo } from "@expo/vector-icons";
-import { FontAwesome5 } from "@expo/vector-icons";
+import { BarCodeScanner } from "expo-barcode-scanner";
+import React, { useState, useEffect,useRef } from "react";
+import { Text, View, StyleSheet, Button ,ScrollView,
+  SafeAreaView } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { SimpleLineIcons } from "@expo/vector-icons";
-import { Ionicons } from "@expo/vector-icons";
-import { FontAwesome } from "@expo/vector-icons";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { useNavigation } from "@react-navigation/core";
+import { FontAwesome5 } from "@expo/vector-icons";
+import Constants from "expo-constants";
+import { Entypo } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
-import {ratingScoreText ,ratingProductComment}  from '../utilis/index';
-import AsyncStorage from '@react-native-community/async-storage';
+import { Header } from "native-base";
+import BottomSheet from 'react-native-gesture-bottom-sheet';
+import ProductScreen from "./ProductScreen";
 
-export default function Home({ route }) {
-  const[id,setId]=useState();
-  const [productHistory, setProductHistory] = useState([]);
-  const[ modalOpen,seModalOpen]=useState(true)
+export default function Home({ navigation }) {
+  const [hasPermission, setHasPermission] = useState(null);
+  const [scanned, setScanned] = useState(false);
+  // const [light, setlight] = useState(false);
+  // const [sound, setSound] = useState(false);
+  // const [results, setResults] = useState([]);
+  // const [searchBarcode, setSearchBarcode] = useState("");
+  // const [isLoading, setIsLoading] = useState(false);
+  const bottomSheet = useRef();
   
-  
+ 
+
+
   useEffect(() => {
-    const fetchProductHistory = async () => {
-      const rawSavedHistory= await AsyncStorage.getItem("productHistory");
-      if(rawSavedHistory !==null){
-        setProductHistory(JSON.parse(rawSavedHistory));
-      }
-    }
-    fetchProductHistory();
-  },[])
+    (async () => {
+      const { status } = await BarCodeScanner.requestPermissionsAsync();
+      setHasPermission(status === "granted");
+    })();
+  }, []);
+
+  const handleBarCodeScanned = ({ type, data }) => {
+    setScanned(true);
+    alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+    // navigation.navigate(product) (data)
+
+    navigation.navigate("Product", { itemId: data });
+    navigation.navigate("Home", { itemId: data });
+  };
+
+  if (hasPermission === null) {
+    return <Text>Demande d'accès à votre caméra</Text>;
+  }
+  if (hasPermission === false) {
+    return <Text>Accès refusé</Text>;
+  }
+ 
 
 
+const displayScan=()=>{
+  return(
+    <View style={styles.container}>
+      <View style={styles.barcodescanner}> 
 
+        <BarCodeScanner
+          onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+          style={StyleSheet.absoluteFillObject}
+        />
 
-return (
-  
-  <View>
-   {productHistory.map(item=>{
- return (
-     <ScrollView>
-      <SafeAreaView style={styles.safeAreaView}>
-        <View style={styles.contenaireProduct}>
-        <View style={styles.card}>
-        <View style={styles.product}>
-            <Image
-              style={{ height: 100, width: 80, borderRadius: 10 }}
-              source={{ uri: item.image_url }}
-            />
+        <View style={styles.icons}>
+          <View style={styles.icon1}>
+            <Entypo name="flashlight" size={24} color="black" />
           </View>
-          <View style={styles.presentation}>
-            <Text style={styles.nameProduct}>{item.product_name}</Text>
-            <Text style={styles.brand}>{item.brands}</Text>
-            
-            <FontAwesome
-              name="circle"
-              size={24}
-              style={styles.circle}
-              
-              color={
-                item.nutrition_grade_fr ==="a"
-                ? colors.green : item.nutrition_grade_fr ==="b"?
-                colors.orange :item.nutrition_grade_fr ==="c"?
-                colors.red : item.nutrition_grade_fr ==="d" ? 
-                colors.brown :item.nutrition_grade_fr ==="e"?
-                colors.black : colors.grey
-              }
-            />
-
+          <View style={styles.icon2}>
+            <FontAwesome5 name="carrot" size={24} color="orange" />
           </View>
-        </View> 
-            </View>
-         
-          </SafeAreaView>
-      </ScrollView>
-   
-   )
+          <View style={styles.icon3}>
+            <AntDesign name="sound" size={24} color="black" />
+          </View>
+        </View>
 
-   })}
+        <View style={styles.square}></View>
+      </View>
+      <View style={styles.doitagain}>
+        {scanned && (
+          <Button
+            title={"Tap to Scan Again"}
+            onPress={() => setScanned(false)}
+          />
+        )}
+     </View>
     </View>
-  ) 
+  )
 }
-  
+console.log(displayScan,"display scann");
+
+
+ 
+ 
+ return (
+    <>
+    
+      <TouchableOpacity
+        style={styles.button}
+        >
+        <MaterialCommunityIcons
+          name="barcode-scan"
+          size={24}
+          color="black"
+          onPress={displayScan}/>
+      </TouchableOpacity> 
+      
+      
+    
+
+{/* <View style={styles.container}>
+      <View style={styles.barcodescanner}> 
+
+        <BarCodeScanner
+          onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+          style={StyleSheet.absoluteFillObject}
+        />
+
+        <View style={styles.icons}>
+          <View style={styles.icon1}>
+            <Entypo name="flashlight" size={24} color="black" />
+          </View>
+          <View style={styles.icon2}>
+            <FontAwesome5 name="carrot" size={24} color="orange" />
+          </View>
+          <View style={styles.icon3}>
+            <AntDesign name="sound" size={24} color="black" />
+          </View>
+        </View>
+
+        <View style={styles.square}></View>
+      </View>
+      <View style={styles.doitagain}>
+        {scanned && (
+          <Button
+            title={"Tap to Scan Again"}
+            onPress={() => setScanned(false)}
+          />
+        )}
+     </View>
+    </View> */}
+   </> 
+  );
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems:"flex-start",
-    justifyContent: "center",
+    backgroundColor: "transparent",
   },
 
-  contenaireProduct:{
-
-    paddingRight:10,
-    paddingLeft:6,
-    
-  },
-
-  card: {
-    borderBottomColor: "grey",
-    borderBottomWidth: 5,
-    flex:1,
-    alignItems:"flex-start",
+  icons: {
     flexDirection: "row",
-    marginTop:10,
-    justifyContent: "space-between",
-    height:120,
-    
-    
+    justifyContent: "space-around",
+    padding: 10,
+    backgroundColor: "transparent",
+    width: 350,
   },
 
-    presentation: {
-    alignItems: "center",
-    marginBottom: 60,
-    justifyContent:"center"
-
+  icon1: {
+    backgroundColor: "transparent",
+    borderRadius: 30,
+    marginLeft: -40,
   },
 
-  qualityTitle: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    
+  icon2: {
+    backgroundColor: "transparent",
+    borderRadius: 30,
   },
- 
-  nameProduct: {
-    fontWeight: "bold",
-    alignItems: "center",
+
+  icon3: {
+    backgroundColor: "transparent",
+    borderRadius: 30,
+  },
+  barcodescanner: {
+    position: "absolute",
+    height: 412,
+    width: 400,
+  },
+
+  square: {
+    width: 250,
+    height: 200,
+    backgroundColor: "transparent",
+    position: "absolute",
     justifyContent: "center",
-    
+    alignItems: "center",
+    borderColor: "white",
+    borderWidth: 4,
+    marginTop: 100,
+    marginLeft: 33,
   },
 
-  brands:{
-  color:"grey",
-  
-
-  
-
-  },
-  ratingScoreText: {
-    fontWeight: "bold",
-    alignItems:"flex-start"
-  },
-  
-  product: {
-    marginBottom: 40,
-   
-    
+  doitagain: {
+    marginTop: 350,
   },
 
-
-
-
-
+  button: {
+    height: 50,
+    width: 50,
+    backgroundColor: '#FFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 20,
+    shadowColor: 'green',
+    shadowOpacity: 0.7,
+    shadowOffset: {
+      height: 4,
+      width: 4,
+    },
+    shadowRadius: 5,
+    elevation: 6,
+  },
+  text: {
+    color: 'white',
+    fontWeight: '600',
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
-
-
-
-  

@@ -34,13 +34,13 @@ export default function App() {
                 inactiveTintColor: "white",
                 style: { backgroundColor: "#5DCC71" },
               }}
-            >
+              >
               <Tab.Screen
                 name="Home"
                 options={{
                   tabBarLabel: "Home",
                   tabBarIcon: ({ color, size }) => (
-                    <FontAwesome5 name="carrot" size={24} color={color} />
+                    <FontAwesome5 name="carrot" size={24} color={color}/>
                   ),
                 }}
               >
@@ -49,10 +49,10 @@ export default function App() {
                     <Stack.Screen
                       name="Home"
                       // options={
-                      //   {
-                      //      headerTitle: () => <Logo />,
-                      //   }
-                      // }
+                      //  {
+                      //    headerTitle: () => <Logo />,
+                      //  }
+                      //  }
                     >
                       {() => <Home {...props} />}
                     </Stack.Screen>
