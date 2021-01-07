@@ -89,6 +89,11 @@ const displayScan=()=>{
 console.log(displayScan,"display scann");
 
 
+//  <BottomSheet hasDraggableIcon ref={bottomSheet} height={400}>
+//       <ProductScreen  />
+//       <Text>OLIVIA </Text>
+//       </BottomSheet>
+
  
  
  return (
@@ -105,39 +110,7 @@ console.log(displayScan,"display scann");
       </TouchableOpacity> 
       
       
-    
-
-{/* <View style={styles.container}>
-      <View style={styles.barcodescanner}> 
-
-        <BarCodeScanner
-          onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-          style={StyleSheet.absoluteFillObject}
-        />
-
-        <View style={styles.icons}>
-          <View style={styles.icon1}>
-            <Entypo name="flashlight" size={24} color="black" />
-          </View>
-          <View style={styles.icon2}>
-            <FontAwesome5 name="carrot" size={24} color="orange" />
-          </View>
-          <View style={styles.icon3}>
-            <AntDesign name="sound" size={24} color="black" />
-          </View>
-        </View>
-
-        <View style={styles.square}></View>
-      </View>
-      <View style={styles.doitagain}>
-        {scanned && (
-          <Button
-            title={"Tap to Scan Again"}
-            onPress={() => setScanned(false)}
-          />
-        )}
-     </View>
-    </View> */}
+   
    </> 
   );
 }
